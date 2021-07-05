@@ -38,13 +38,13 @@ public class User {
     @Size(max = 32)
     private String email;
 
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.EAGER)
     public Set<User> friends = new HashSet<>();
 
-    @OneToMany(mappedBy = "user")
+    @OneToMany(mappedBy = "user" , fetch = FetchType.EAGER)
     private List<Message> messages = new ArrayList<>();
 
-    @OneToMany(mappedBy = "user")
+    @OneToMany(mappedBy = "user", fetch = FetchType.EAGER)
     private List<Request> requests=new ArrayList<>();
 
     public Set<User> getFriends() {
@@ -136,14 +136,9 @@ public class User {
 
     @Override
     public String toString() {
-        return "User{" +
-                "userId=" + userId +
+        return
                 ", userName='" + userName + '\'' +
-                ", password='" + password + '\'' +
                 ", email='" + email + '\'' +
-                ", friends=" + friends +
-                ", messages=" + messages +
-                ", requests=" + requests +
                 '}';
     }
 }

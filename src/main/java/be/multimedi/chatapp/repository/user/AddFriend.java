@@ -22,6 +22,8 @@ public class AddFriend {
             User u = em.find(User.class, user.getUserId());
             User friend = em.find(User.class, id);
             u.addFriend(friend);
+            friend.addFriend(u);
+            em.persist(friend);
             em.persist(u);
             tx.commit();
         } finally {

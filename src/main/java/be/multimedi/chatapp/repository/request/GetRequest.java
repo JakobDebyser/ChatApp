@@ -1,6 +1,7 @@
 package be.multimedi.chatapp.repository.request;
 
 import be.multimedi.chatapp.domain.Request;
+import be.multimedi.chatapp.domain.User;
 
 import javax.persistence.*;
 import java.util.List;
@@ -8,10 +9,10 @@ import java.util.List;
 public class GetRequest {
 
     public static void main(String[] args) {
-        getRequest();
+     //   getRequest();
     }
 
-    public static List<Request> getRequest() {
+    public static List<Request> getRequest(User user) {
         EntityManagerFactory emf = null;
         EntityManager em = null;
         List<Request> results=null;
