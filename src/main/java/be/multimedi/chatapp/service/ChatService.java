@@ -16,11 +16,11 @@ public class ChatService {
     User user;
 
     public void register() {
-        RegisterUser.registerNewClient();
+        UserRepository.RegisterUser();
     }
 
     public void login() {
-        user = LogInUser.loginClient();
+        user=UserRepository.logInUser();
         try {
             MenuHelper.subMenu(user);
         } catch (Exception e) {
@@ -111,8 +111,7 @@ public class ChatService {
         System.out.println("++++++++++++++++");
         System.out.println("+ Search Result + ");
         System.out.println("++++++++++++++++");
-
-        List<User> list = FindUsers.findUsers(KeyboardHelper.askForText(">"));
+        List<User> list=UserRepository.findUsers(KeyboardHelper.askForText(">"));
         int index = 1;
         int num = KeyboardHelper.askForNumber(">");
         User friend = null;

@@ -3,21 +3,75 @@ package be.multimedi.chatapp.repository.user;
 import be.multimedi.chatapp.domain.Request;
 import be.multimedi.chatapp.domain.User;
 import be.multimedi.chatapp.util.JpaHelper;
+import be.multimedi.chatapp.util.KeyboardHelper;
 
-import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
-import javax.persistence.EntityTransaction;
-import javax.persistence.Persistence;
+import javax.persistence.TypedQuery;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
 public class UserRepository {
-    public static void main(String[] args) {
-        Set<User> users= findFriends(47L);
-        users.forEach(System.out::println);
+
+    public static void RegisterUser() {
+        System.out.println("++++++++++++++++");
+        System.out.println("+ 1. Register  +");
+        System.out.println("++++++++++++++++");
+        String username = KeyboardHelper.askForText("UserName: ");
+        String email = KeyboardHelper.askForText("Email Address: ");
+        String password = KeyboardHelper.askForText("Password: ");
+
+        JpaHelper jpaHelper = new JpaHelper();
+        jpaHelper.execute(em -> {
+            User user = new User();
+            user.setUserName(username);
+            user.setEmail(email);
+            user.setPassword(password);
+            em.persist(user);
+            em.flush();
+            System.out.println(user.getUserId());
+            System.out.println("New account '" + user.getUserName() + "' has been succesfully registered");
+        });
     }
+    public static User logInUser() {
+        System.out.println("++++++++++++++++");
+        System.out.println("+    Log in    +");
+        System.out.println("++++++++++++++++");
+
+        String log= KeyboardHelper.askForText("Username or email address: ");
+        String pw= KeyboardHelper.askForText("Password: ");
+        System.out.println("Logging in as " + log + "...");
+        JpaHelper jpaHelper=new JpaHelper();
+        return jpaHelper.execute(em -> {
+            User user=null;
+            String q= "select c from User as c where c.userName='"+log + "'" + " OR c.email='"+log+"' and c.password='"+pw+"'";
+            TypedQuery<User> query=em.createQuery(q, User.class);
+            List<User> results = query.getResultList();
+            for (User c: results
+            ) {
+                user = c;
+                System.out.println(user);
+            }
+            return user;
+        });
+    }
+
+    public static List<User> findUsers(String name) {
+
+        JpaHelper jpaHelper=new JpaHelper();
+        return jpaHelper.execute(em -> {
+            int i=1;
+            String q = "select c from User as c where c.userName LIKE '%" + name + "%'";
+            TypedQuery<User> query = em.createQuery(q, User.class);
+            List<User> users = query.getResultList();
+            for (User u : users
+            ) {
+                System.out.printf("%s %d %s %s  %n", "+", i, ".",u.getUserName());
+                i+=1;
+            }
+            return users;
+        });
+    }
+
     public static User findUser(long id) {
         JpaHelper jpaHelper = new JpaHelper();
         return jpaHelper.execute(em -> {
