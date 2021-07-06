@@ -42,6 +42,7 @@ public class RequestRepository {
             User u = em.find(User.class, userId);
             Request r=em.find(Request.class, rId);
             u.removeRequest(r);
+            em.remove(r);
             em.persist(u);
         });
     }
