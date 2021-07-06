@@ -132,6 +132,7 @@ public class ChatService {
         System.out.println("+ " + friend.getUserName() + " + ");
 
         UserRepository.addRequest(user.getUserId(), friend.getUserId());
+        RequestRepository.saveRequest(user.getUserId(), friend.getUserId(), LocalDateTime.now());
         System.out.println("Friend request sent to '" + friend.getUserName() + "'");
         MenuHelper.subMenu(user);
     }
