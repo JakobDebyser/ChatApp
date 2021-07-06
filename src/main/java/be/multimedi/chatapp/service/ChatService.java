@@ -4,7 +4,7 @@ import be.multimedi.chatapp.domain.Request;
 import be.multimedi.chatapp.domain.User;
 import be.multimedi.chatapp.repository.message.MessageRepository;
 import be.multimedi.chatapp.repository.request.RequestRepository;
-import be.multimedi.chatapp.repository.user.*;
+import be.multimedi.chatapp.repository.user.UserRepository;
 import be.multimedi.chatapp.util.KeyboardHelper;
 import be.multimedi.chatapp.util.MenuHelper;
 
@@ -20,7 +20,7 @@ public class ChatService {
     }
 
     public void login() {
-        user=UserRepository.logInUser();
+        user = UserRepository.logInUser();
         try {
             MenuHelper.subMenu(user);
         } catch (Exception e) {
@@ -86,20 +86,19 @@ public class ChatService {
                 MenuHelper.subMenu(user);
 
             } else {
-                   MessageRepository.getMessages(user, friend);
+                MessageRepository.getMessages(user, friend);
                 int msgNum = 1;
                 while (msgNum < 5) {
                     System.out.println("[" + LocalDateTime.now() + "]" + friend.getUserName());
                     String msg = KeyboardHelper.askForText(">");
-                   // SaveMessage.saveMessage(msg, friend.getUserId());
+                    // SaveMessage.saveMessage(msg, friend.getUserId());
                     MessageRepository.saveMessage(msg, friend.getUserId());
                     System.out.println("[" + LocalDateTime.now() + "]" + user.getUserName());
                     msg = KeyboardHelper.askForText(">");
                     MessageRepository.saveMessage(msg, user.getUserId());
                     msgNum += 1;
+                    MenuHelper.subMenu(user);
                 }
-
-                MenuHelper.subMenu(user);
             }
         }
 
@@ -111,7 +110,7 @@ public class ChatService {
         System.out.println("++++++++++++++++");
         System.out.println("+ Search Result + ");
         System.out.println("++++++++++++++++");
-        List<User> list=UserRepository.findUsers(KeyboardHelper.askForText(">"));
+        List<User> list = UserRepository.findUsers(KeyboardHelper.askForText(">"));
         int index = 1;
         int num = KeyboardHelper.askForNumber(">");
         User friend = null;
@@ -139,7 +138,7 @@ public class ChatService {
 
     public void requests() {
         int i = 1;
-        List<Request> requests= RequestRepository.getRequest();
+        List<Request> requests = RequestRepository.getRequest();
         if (requests.size() == 0) {
             System.out.println("Er is geen request");
             MenuHelper.subMenu(user);
@@ -161,7 +160,7 @@ public class ChatService {
             int index = 1;
             int num = KeyboardHelper.askForNumber(">");
             User friend = null;
-            Request request=null;
+            Request request = null;
             System.out.println("");
             while (num > requests.size()) {
                 System.out.println("num is niet just");
@@ -172,8 +171,8 @@ public class ChatService {
             ) {
                 if (r.getUser().getUserName().equals(user.getUserName())) {
                     if (num == index) {
-                        friend=UserRepository.findUser(r.getRequestName().getUserId());
-                        request=r;
+                        friend = UserRepository.findUser(r.getRequestName().getUserId());
+                        request = r;
                         System.out.println("+ " + index + ". " + r.getRequestName() + " +");
                     }
                     index += 1;
@@ -183,14 +182,8 @@ public class ChatService {
             UserRepository.addFriend(user.getUserId(), friend.getUserId());
             RequestRepository.RemoveRequest(user.getUserId(), request.getId());
             System.out.println("Friend added '" + friend.getUserName() + " " + request.getRequestName() + " " + "deleted");
-
+            MenuHelper.subMenu(user);
         }
-
-        MenuHelper.subMenu(user);
-    }
-
-    public static void exit() {
-
     }
 
 }
