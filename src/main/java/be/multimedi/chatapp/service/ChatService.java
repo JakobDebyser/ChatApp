@@ -2,9 +2,8 @@ package be.multimedi.chatapp.service;
 
 import be.multimedi.chatapp.domain.Request;
 import be.multimedi.chatapp.domain.User;
-import be.multimedi.chatapp.repository.message.GetMessage;
-import be.multimedi.chatapp.repository.message.SaveMessage;
-import be.multimedi.chatapp.repository.request.GetRequest;
+import be.multimedi.chatapp.repository.message.MessageRepository;
+import be.multimedi.chatapp.repository.request.RequestRepository;
 import be.multimedi.chatapp.repository.user.*;
 import be.multimedi.chatapp.util.KeyboardHelper;
 import be.multimedi.chatapp.util.MenuHelper;
@@ -34,21 +33,20 @@ public class ChatService {
         int i = 1;
         int index = 1;
         User friend = null;
-        Set<User> list = user.getFriends();
-     //   list.forEach(System.out::println);
+
+        Set<User> list = UserRepository.findFriends(user.getUserId());
+        //   list.forEach(System.out::println);
         System.out.println("++++++++++++++++");
         System.out.println("+   Friends    +");
         System.out.println("++++++++++++++++");
-        if(list.size()==0){
+        if (list.size() == 0) {
             System.out.println("Geen vrienden toegevoed Wil je request sturen?");
             System.out.println("Ja = 1");
-            int x=KeyboardHelper.askForNumber(">");
-            if(x==1){
-                requests();
-            }
-            else MenuHelper.subMenu(user);
-        }
-        else {
+            int x = KeyboardHelper.askForNumber(">");
+            if (x == 1) {
+                addRequest();
+            } else MenuHelper.subMenu(user);
+        } else {
             for (User u : list
             ) {
                 System.out.println("+ " + i + ". " + u.getUserName() + " +");
@@ -83,20 +81,21 @@ public class ChatService {
                 n = KeyboardHelper.askForNumber(">");
             }
             if (n == 2) {
-                RemoveFriend.removeUser(user, friend);
-                System.out.println(friend + "is removed");
+                UserRepository.RemoveFriend(user.getUserId(), friend.getUserId());
+                System.out.println(friend.getUserName() + "is removed");
                 MenuHelper.subMenu(user);
 
             } else {
-                GetMessage.getMessages(user, friend);
+                   MessageRepository.getMessages(user, friend);
                 int msgNum = 1;
                 while (msgNum < 5) {
                     System.out.println("[" + LocalDateTime.now() + "]" + friend.getUserName());
                     String msg = KeyboardHelper.askForText(">");
-                    SaveMessage.saveMessage(msg, friend.getUserId());
+                   // SaveMessage.saveMessage(msg, friend.getUserId());
+                    MessageRepository.saveMessage(msg, friend.getUserId());
                     System.out.println("[" + LocalDateTime.now() + "]" + user.getUserName());
                     msg = KeyboardHelper.askForText(">");
-                    SaveMessage.saveMessage(msg, user.getUserId());
+                    MessageRepository.saveMessage(msg, user.getUserId());
                     msgNum += 1;
                 }
 
@@ -134,55 +133,63 @@ public class ChatService {
         System.out.println("++++++++++++++++");
         System.out.println("+ " + friend.getUserName() + " + ");
 
-        AddRequest.addRequest(user, friend.getUserId());
+        UserRepository.addRequest(user.getUserId(), friend.getUserId());
         System.out.println("Friend request sent to '" + friend.getUserName() + "'");
         MenuHelper.subMenu(user);
     }
 
     public void requests() {
-        int i =1;
-        List<Request> requests = GetRequest.getRequest(user);
-       // List<Request> requests =user.getRequests();
-        System.out.println("++++++++++++++++");
-        System.out.println("+   Requests   +");
-        System.out.println("++++++++++++++++");
-        for (Request u : requests
-        ) {
-            if(u.getUser().getUserName().equals(user.getUserName())){
-                System.out.println("+ " + i + ". " + u.getRequestName() + " +");
-                i += 1;
-            }
-
-        }
-        System.out.println("++++++++++++++++++");
-        System.out.println("Accept:");
-
-        int index = 1;
-        int num = KeyboardHelper.askForNumber(">");
-        String name = null;
-        System.out.println("");
-        while (num > requests.size()) {
-            System.out.println("num is niet just");
-            num = KeyboardHelper.askForNumber(">");
-        }
-
-        for (Request r : requests
-        ) {
-            if (r.getUser().getUserName().equals(user.getUserName())) {
-                if (num == index) {
-                    name = r.getRequestName();
-                    System.out.println("+ " + index + ". " + r.getRequestName() + " +");
-                }
-                index += 1;
-            }
-        }
+        int i = 1;
+        List<Request> requests= RequestRepository.getRequest();
+        if (requests.size() == 0) {
+            System.out.println("Er is geen request");
+            MenuHelper.subMenu(user);
+        } else {
             System.out.println("++++++++++++++++");
-            User friend = FindUsers.findUsers(name).get(0);
-            AddFriend.addFriend(user, friend.getUserId());
+            System.out.println("+   Requests   +");
+            System.out.println("++++++++++++++++");
+            for (Request u : requests
+            ) {
+                if (u.getUser().getUserName().equals(user.getUserName())) {
+                    System.out.println("+ " + i + ". " + u.getRequestName().getUserName() + " +");
+                    i += 1;
+                }
 
-            System.out.println("Friend added '" + friend.getUserName() + "'");
+            }
+            System.out.println("++++++++++++++++++");
+            System.out.println("Accept:");
+
+            int index = 1;
+            int num = KeyboardHelper.askForNumber(">");
+            User friend = null;
+            Request request=null;
+            System.out.println("");
+            while (num > requests.size()) {
+                System.out.println("num is niet just");
+                num = KeyboardHelper.askForNumber(">");
+            }
+
+            for (Request r : requests
+            ) {
+                if (r.getUser().getUserName().equals(user.getUserName())) {
+                    if (num == index) {
+                        friend=UserRepository.findUser(r.getRequestName().getUserId());
+                        request=r;
+                        System.out.println("+ " + index + ". " + r.getRequestName() + " +");
+                    }
+                    index += 1;
+                }
+            }
+            System.out.println("++++++++++++++++");
+            UserRepository.addFriend(user.getUserId(), friend.getUserId());
+            RequestRepository.RemoveRequest(user.getUserId(), request.getId());
+            System.out.println("Friend added '" + friend.getUserName() + " " + request.getRequestName() + " " + "deleted");
+
+        }
+
         MenuHelper.subMenu(user);
     }
+
     public static void exit() {
 
     }

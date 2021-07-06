@@ -38,13 +38,13 @@ public class User {
     @Size(max = 32)
     private String email;
 
-    @ManyToMany(fetch = FetchType.EAGER)
+    @ManyToMany
     public Set<User> friends = new HashSet<>();
 
-    @OneToMany(mappedBy = "user" , fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "user")
     private List<Message> messages = new ArrayList<>();
 
-    @OneToMany(mappedBy = "user", fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "user")
     private List<Request> requests=new ArrayList<>();
 
     public Set<User> getFriends() {

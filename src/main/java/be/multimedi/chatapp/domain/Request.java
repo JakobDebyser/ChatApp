@@ -16,8 +16,9 @@ public class Request {
     @Column(name = "ACCEPT")
     private Boolean accept;
 
-    @Column(name = "REQUEST")
-    private String requestName;
+
+    @ManyToOne
+    private User requestName;
 
     @Column(name = "DATE_TIME")
     private LocalDateTime dateTime;
@@ -41,11 +42,11 @@ public class Request {
         this.accept = accept;
     }
 
-    public String getRequestName() {
+    public User getRequestName() {
         return requestName;
     }
 
-    public void setRequestName(String requestName) {
+    public void setRequestName(User requestName) {
         this.requestName = requestName;
     }
 
@@ -67,6 +68,6 @@ public class Request {
 
     @Override
     public String toString() {
-        return   requestName+" heeft een request gestuurd " + "op "+ dateTime;
+        return   requestName.getUserName() +" heeft een request gestuurd " + "op "+ dateTime;
     }
 }

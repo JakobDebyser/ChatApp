@@ -30,6 +30,7 @@ public class LogInUser {
             System.out.println("Logging in as " + log + "...");
 
             String q= "select c from User as c where c.userName='"+log + "'" + " OR c.email='"+log+"' and c.password='"+pw+"'";
+            System.out.println(q);
             TypedQuery<User> query=em.createQuery(q, User.class);
             List<User> results = query.getResultList();
             for (User c: results
